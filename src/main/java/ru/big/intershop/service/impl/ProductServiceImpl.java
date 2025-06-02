@@ -24,17 +24,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto update(ProductUpdate productUpdate) {
-        return null;
+    public void update(Long id, ProductRequest productRequest) {
+        Product product = getProduct(id);
+
+        product.setTitle(productRequest.title());
+        product.setDescription(productRequest.description());
+        product.setPrice(productRequest.price());
     }
 
     @Override
     public ProductDto get(Long id) {
-        return null;
+        return ProductMapper.toDto(getProduct(id));
     }
 
     @Override
     public void delete(Long id) {
+        productRepository.deleteById(id);
+    }
 
+    private Product getProduct(Long id) {
+        return productRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("Product not found - " + id));
     }
 }

@@ -22,36 +22,66 @@
     </nav>
 </header>
 <main style="max-width: var(--content-width); margin: auto">
-    <form>
-        <div style="display: flex; justify-content: space-between; gap: 1rem;">
-            <div class="mb-3" style="width: 100%">
-                <label for="titleInput" class="form-label">Наименование</label>
-                <input type="text" class="form-control" id="titleInput">
+    <form class="d-flex align-items-start gap-3"
+          method="post"
+          action="admin/product"
+          th:action="@{${id==null ? 'admin/product' : 'admin/product/' + id +'/edit'}}"
+          enctype="multipart/form-data"
+          th:object="${productRequest}"
+    >
+        <div class="w-25">
+            <img class="img-thumbnail" src="/img/promo.jpeg" alt="...">
+        </div>
+        <div class="w-100">
+            <div style="display: flex; justify-content: space-between; gap: 1rem;">
+                <div class="mb-3" style="width: 100%">
+                    <label for="titleInput" class="form-label">Наименование</label>
+                    <input type="text"
+                           class="form-control"
+                           th:field="${productRequest.title}"
+                           th:value="${productRequest.title==null ? '' : productRequest.title}"
+                           id="titleInput"
+                           autocomplete="off"
+                           required>
+                </div>
+                <div class="mb-3">
+                    <label for="priceInput" class="form-label">Цена</label>
+                    <input type="number"
+                           class="form-control"
+                           id="priceInput"
+                           th:field="${productRequest.price}"
+                           th:value="${productRequest.price==null ? '' : productRequest.price}"
+                           autocomplete="off"
+                           required>
+                </div>
             </div>
             <div class="mb-3">
-                <label for="priceInput" class="form-label">Цена</label>
-                <input type="number" class="form-control" id="priceInput">
-            </div>
-        </div>
-        <div class="mb-3" style="display: flex; gap: 1rem;">
-            <div style="    width: 30%;">
                 <div class="mb-3">
                     <label for="formFile" class="form-label">Изображение</label>
-                    <input class="form-control" type="file" id="formFile">
+                    <input class="form-control"
+                           type="file"
+                           id="formFile"
+                           th:field="${productRequest.image}"
+                           accept="image/png, image/gif, image/jpeg"
+                           multiple
+                           required>
                 </div>
-                <div>
-                    <img src="/img/promo.jpeg" alt="hello" style="    width: 100%;">
+                <div class="mb-3" style="width: 100%">
+                    <label for="descriptionInput" class="form-label">Описание</label>
+                    <textarea class="form-control"
+                              id="descriptionInput"
+                              rows="4"
+                              th:field="${productRequest.description}"
+                              th:value="${productRequest.description==null ? '' : productRequest.description}"
+                              required></textarea>
                 </div>
-
-            </div>
-
-            <div class="mb-3" style="width: 100%">
-                <label for="descriptionInput" class="form-label">Описание</label>
-                <textarea class="form-control" id="descriptionInput" rows="6"></textarea>
+                <div class="btn-group float-end" role="group">
+                    <button id="addProduct" type="submit" class="mb-3 btn btn-outline-primary">Добавить</button>
+                </div>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Добавить</button>
+
     </form>
 
     <table class="table">
@@ -59,7 +89,7 @@
         <tr>
             <th scope="col">#</th>
             <th scope="col">Название</th>
-            <th scope="col">Описание</th>
+            <th class="w-100" scope="col">Описание</th>
             <th scope="col">Цена</th>
             <th scope="col"></th>
             <th scope="col"></th>
@@ -68,18 +98,28 @@
         <tbody>
         <tr th:each="product : ${products}">
             <th scope="row" th:text="${product.id()}"></th>
-            <td th:text="${product.title()}"></td>
-            <td th:text="${product.description()}"></td>
-            <td th:text="${product.price()}"></td>
+            <td th:id="${'title' + product.id()}" th:text="${product.title()}"></td>
+            <td th:id="${'description' + product.id()}" th:text="${product.description()}"></td>
+            <td th:id="${'price' + product.id()}" th:text="${product.price()}"></td>
+
             <td>
-                <button type="button" class="btn btn-outline-warning" style="border-radius: 70%;">
+                <button type="button"
+
+                        class="btn btn-outline-warning rounded-circle"
+                        th:id="${product.id()}"
+                        onclick="editProduct(this.id)"
+
+                >
                     <i class="bi bi-pen"></i>
                 </button>
             </td>
+
             <td>
-                <button type="button" class="btn btn-outline-danger" style="border-radius: 70%;">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <form method="post" th:action="@{/admin/product/{id}/delete(id=${product.id()})}">
+                    <button type="submit" class="btn btn-outline-danger rounded-circle">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
             </td>
         </tr>
         </tbody>
@@ -87,4 +127,58 @@
 </main>
 
 </body>
+
+<script>
+    function editProduct(id) {
+        const title = document.getElementById("title" + id);
+        const description = document.getElementById("description" + id);
+        const price = document.getElementById("price" + id);
+
+        const titleInput = document.getElementById("titleInput");
+        const descriptionInput = document.getElementById("descriptionInput");
+        const priceInput = document.getElementById("priceInput");
+
+        titleInput.value = title.textContent
+        descriptionInput.value = description.textContent
+        priceInput.value = price.textContent
+
+        const button = document.getElementById("addProduct");
+        button.innerText = 'Изменить'
+
+        if (document.getElementById("clearButton") == null) {
+            const clearButton = document.createElement("button")
+            clearButton.id = "clearButton"
+            clearButton.innerHTML = "Отменить"
+            clearButton.type = 'reset'
+            clearButton.className = "btn btn-outline-secondary mb-3"
+            clearButton.onclick = function () {
+                const titleInput = document.getElementById("titleInput");
+                const descriptionInput = document.getElementById("descriptionInput");
+                const priceInput = document.getElementById("priceInput");
+
+                titleInput.value = ''
+                descriptionInput.value = ''
+                priceInput.value = ''
+
+                const button = document.getElementById("addProduct");
+                button.innerText = 'Добавить'
+                clearButton.remove()
+            }
+            button.parentNode.appendChild(clearButton)
+        }
+    }
+
+    function clearForm() {
+        const titleInput = document.getElementById("titleInput");
+        const descriptionInput = document.getElementById("descriptionInput");
+        const priceInput = document.getElementById("priceInput");
+
+        titleInput.value = ''
+        descriptionInput.value = ''
+        priceInput.value = ''
+
+        const button = document.getElementById("addProduct");
+        button.innerText = 'Добавить'
+    }
+</script>
 </html>
