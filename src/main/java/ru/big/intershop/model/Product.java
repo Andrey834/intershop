@@ -35,6 +35,7 @@ public class Product {
     private String title;
     @Column(length = 600)
     private String description;
+    private String image;
     @Column(scale = 2)
     private BigDecimal price;
     private LocalDateTime created;

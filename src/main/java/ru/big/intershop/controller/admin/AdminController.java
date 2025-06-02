@@ -52,8 +52,7 @@ public class AdminController {
 
     @PostMapping("/product/{id}/edit")
     public String processEditProduct(@PathVariable(name = "id") Long id,
-                                @ModelAttribute ProductRequest product,
-                                Model model) {
+                                @ModelAttribute ProductRequest product) {
         productService.update(id, product);
         return REDIRECT_PATH;
     }

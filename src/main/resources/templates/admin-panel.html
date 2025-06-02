@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-<header class="header">
+<header class="mb-3">
     <nav class="navbar navbar-light bg-light">
-        <div class="container-fluid header_nav_div ">
+        <div class="container-fluid p-0 m-auto content-width">
             <a class="navbar-brand">Market</a>
             <div class="btn-group" role="group" aria-label="Basic outlined example">
                 <a th:href="@{/product}" type="button" class="btn btn-outline-primary">Заказы</a>
@@ -21,25 +21,23 @@
         </div>
     </nav>
 </header>
-<main style="max-width: var(--content-width); margin: auto">
+<main class="m-auto content-width">
     <form class="d-flex align-items-start gap-3"
+          id="inputForm"
           method="post"
           action="admin/product"
-          th:action="@{${id==null ? 'admin/product' : 'admin/product/' + id +'/edit'}}"
           enctype="multipart/form-data"
-          th:object="${productRequest}"
-    >
+          th:object="${productRequest}">
         <div class="w-25">
-            <img class="img-thumbnail" src="/img/promo.jpeg" alt="...">
+            <img id="promoImage" class="img-thumbnail" src="/img/promo.jpeg" alt="default image">
         </div>
         <div class="w-100">
-            <div style="display: flex; justify-content: space-between; gap: 1rem;">
+            <div class="d-flex justify-content-between gap-3">
                 <div class="mb-3" style="width: 100%">
                     <label for="titleInput" class="form-label">Наименование</label>
                     <input type="text"
                            class="form-control"
                            th:field="${productRequest.title}"
-                           th:value="${productRequest.title==null ? '' : productRequest.title}"
                            id="titleInput"
                            autocomplete="off"
                            required>
@@ -47,20 +45,20 @@
                 <div class="mb-3">
                     <label for="priceInput" class="form-label">Цена</label>
                     <input type="number"
+                           step="0.01"
                            class="form-control"
                            id="priceInput"
                            th:field="${productRequest.price}"
-                           th:value="${productRequest.price==null ? '' : productRequest.price}"
                            autocomplete="off"
                            required>
                 </div>
             </div>
             <div class="mb-3">
                 <div class="mb-3">
-                    <label for="formFile" class="form-label">Изображение</label>
+                    <label for="imageInput" class="form-label">Изображение</label>
                     <input class="form-control"
                            type="file"
-                           id="formFile"
+                           id="imageInput"
                            th:field="${productRequest.image}"
                            accept="image/png, image/gif, image/jpeg"
                            multiple
@@ -72,18 +70,15 @@
                               id="descriptionInput"
                               rows="4"
                               th:field="${productRequest.description}"
-                              th:value="${productRequest.description==null ? '' : productRequest.description}"
-                              required></textarea>
+                              required>
+                    </textarea>
                 </div>
                 <div class="btn-group float-end" role="group">
                     <button id="addProduct" type="submit" class="mb-3 btn btn-outline-primary">Добавить</button>
                 </div>
             </div>
         </div>
-
-
     </form>
-
     <table class="table">
         <thead>
         <tr>
@@ -91,6 +86,7 @@
             <th scope="col">Название</th>
             <th class="w-100" scope="col">Описание</th>
             <th scope="col">Цена</th>
+            <th scope="col">Изображение</th>
             <th scope="col"></th>
             <th scope="col"></th>
         </tr>
@@ -101,19 +97,16 @@
             <td th:id="${'title' + product.id()}" th:text="${product.title()}"></td>
             <td th:id="${'description' + product.id()}" th:text="${product.description()}"></td>
             <td th:id="${'price' + product.id()}" th:text="${product.price()}"></td>
-
+            <td th:id="${'image' + product.id()}" th:text="${product.image()}"></td>
             <td>
                 <button type="button"
-
                         class="btn btn-outline-warning rounded-circle"
                         th:id="${product.id()}"
                         onclick="editProduct(this.id)"
-
                 >
                     <i class="bi bi-pen"></i>
                 </button>
             </td>
-
             <td>
                 <form method="post" th:action="@{/admin/product/{id}/delete(id=${product.id()})}">
                     <button type="submit" class="btn btn-outline-danger rounded-circle">
@@ -125,60 +118,62 @@
         </tbody>
     </table>
 </main>
-
 </body>
-
 <script>
     function editProduct(id) {
         const title = document.getElementById("title" + id);
         const description = document.getElementById("description" + id);
         const price = document.getElementById("price" + id);
+        const image = document.getElementById("image" + id);
 
         const titleInput = document.getElementById("titleInput");
         const descriptionInput = document.getElementById("descriptionInput");
         const priceInput = document.getElementById("priceInput");
+        const imageInput = document.getElementById("imageInput");
+        const imagePromo = document.getElementById("promoImage");
 
         titleInput.value = title.textContent
         descriptionInput.value = description.textContent
         priceInput.value = price.textContent
+        imagePromo.src = "images/" + image.textContent
+        imageInput.required = false;
 
-        const button = document.getElementById("addProduct");
-        button.innerText = 'Изменить'
+        changeButtonText('addProduct', 'Изменить')
 
         if (document.getElementById("clearButton") == null) {
-            const clearButton = document.createElement("button")
-            clearButton.id = "clearButton"
-            clearButton.innerHTML = "Отменить"
-            clearButton.type = 'reset'
-            clearButton.className = "btn btn-outline-secondary mb-3"
-            clearButton.onclick = function () {
-                const titleInput = document.getElementById("titleInput");
-                const descriptionInput = document.getElementById("descriptionInput");
-                const priceInput = document.getElementById("priceInput");
+            const inputForm = document.getElementById("inputForm");
+            inputForm.action = "/admin/product/" + id + "/edit"
 
-                titleInput.value = ''
-                descriptionInput.value = ''
-                priceInput.value = ''
-
-                const button = document.getElementById("addProduct");
-                button.innerText = 'Добавить'
-                clearButton.remove()
-            }
-            button.parentNode.appendChild(clearButton)
+            const clearButton = getClearButton();
+            document.getElementById("addProduct").parentNode.appendChild(clearButton)
         }
     }
 
-    function clearForm() {
-        const titleInput = document.getElementById("titleInput");
-        const descriptionInput = document.getElementById("descriptionInput");
-        const priceInput = document.getElementById("priceInput");
+    function getClearButton() {
+        const clearButton = document.createElement("button")
+        clearButton.id = "clearButton"
+        clearButton.innerHTML = "Отменить"
+        clearButton.type = 'reset'
+        clearButton.className = "btn btn-outline-secondary mb-3"
 
-        titleInput.value = ''
-        descriptionInput.value = ''
-        priceInput.value = ''
+        clearButton.onclick = function () {
+            const inputForm = document.getElementById("inputForm");
+            inputForm.action = "/admin/product"
 
-        const button = document.getElementById("addProduct");
-        button.innerText = 'Добавить'
+            document.getElementById("titleInput").value = '';
+            document.getElementById("descriptionInput").value = '';
+            document.getElementById("priceInput").value = '';
+
+            changeButtonText("addProduct", "Добавить")
+
+            clearButton.remove()
+        }
+        return clearButton
+    }
+
+    function changeButtonText(buttonId, text) {
+        const button = document.getElementById(buttonId);
+        button.innerText = text
     }
 </script>
 </html>

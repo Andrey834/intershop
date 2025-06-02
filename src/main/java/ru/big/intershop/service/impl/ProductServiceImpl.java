@@ -7,29 +7,44 @@ import ru.big.intershop.dto.product.ProductUpdate;
 import ru.big.intershop.mapper.ProductMapper;
 import ru.big.intershop.model.Product;
 import ru.big.intershop.repository.ProductRepository;
+import ru.big.intershop.service.ImageService;
 import ru.big.intershop.service.ProductService;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ImageService imageService;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ImageService imageService) {
         this.productRepository = productRepository;
+        this.imageService = imageService;
     }
 
     @Override
     public ProductDto create(ProductRequest productRequest) {
-        Product product = productRepository.save(ProductMapper.toProduct(productRequest));
-        return ProductMapper.toDto(product);
+        String imageName = imageService.save(productRequest.image());
+        Product product = ProductMapper.toProduct(productRequest);
+        product.setImage(imageName);
+        Product newProduct = productRepository.save(product);
+
+        return ProductMapper.toDto(newProduct);
     }
 
     @Override
     public void update(Long id, ProductRequest productRequest) {
         Product product = getProduct(id);
 
+        if (!productRequest.image().isEmpty()) {
+            imageService.delete(product.getImage());
+            String imageName = imageService.save(productRequest.image());
+            product.setImage(imageName);
+        }
+
         product.setTitle(productRequest.title());
         product.setDescription(productRequest.description());
         product.setPrice(productRequest.price());
+
+        productRepository.save(product);
     }
 
     @Override
@@ -39,7 +54,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
-        productRepository.deleteById(id);
+        Product product = getProduct(id);
+        imageService.delete(product.getImage());
+        productRepository.delete(product);
     }
 
     private Product getProduct(Long id) {

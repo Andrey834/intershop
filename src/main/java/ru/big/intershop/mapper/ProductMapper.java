@@ -5,8 +5,6 @@ import ru.big.intershop.dto.product.ProductRequest;
 import ru.big.intershop.dto.product.ProductShortDto;
 import ru.big.intershop.model.Product;
 
-import java.time.LocalDateTime;
-
 public class ProductMapper {
 
     private ProductMapper() {
@@ -26,6 +24,7 @@ public class ProductMapper {
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .image(product.getImage())
                 .created(product.getCreated().toString())
                 .build();
     }
@@ -36,6 +35,7 @@ public class ProductMapper {
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .image(product.getImage())
                 .build();
     }
 }

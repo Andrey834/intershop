@@ -10,7 +10,7 @@ public record ProductDto(
         String title,
         String description,
         BigDecimal price,
-        String largeImageUrl,
+        String image,
         String created
 ) {
 }
