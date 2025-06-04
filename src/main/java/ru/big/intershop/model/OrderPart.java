@@ -1,6 +1,9 @@
 package ru.big.intershop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,9 +32,11 @@ public class OrderPart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @JsonBackReference
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     private Order order;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Product product;
     private int quantity;
     private BigDecimal price;

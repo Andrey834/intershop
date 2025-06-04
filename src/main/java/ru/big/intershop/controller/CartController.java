@@ -4,11 +4,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.big.intershop.model.OrderPart;
+import ru.big.intershop.dto.ItemCart;
+import ru.big.intershop.dto.ItemCartRequest;
 import ru.big.intershop.service.CartService;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/cart")
@@ -20,13 +25,24 @@ public class CartController {
     }
 
     @GetMapping
-    public String cart() {
+    public String cart(Model model) {
+        List<ItemCart> cart = cartService.getCart();
+        BigDecimal total = cartService.getTotal();
+        model.addAttribute("cart", cart);
+        model.addAttribute("total", total);
         return "cart";
     }
 
     @PostMapping
-    public String add(@RequestParam Long productId, Model model) {
-        cartService.add(productId);
-        return "redirect:/cart?productId=" + productId;
+    public String add(@ModelAttribute ItemCartRequest itemCartRequest, @RequestParam String from) {
+        cartService.update(itemCartRequest);
+
+        return "redirect:/" + from;
+    }
+
+    @PostMapping("/delete")
+    public String deletePosition(@RequestParam(name = "productId") Long productId) {
+        cartService.remove(productId);
+        return "redirect:/cart";
     }
 }

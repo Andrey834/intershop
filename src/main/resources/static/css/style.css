@@ -28,6 +28,10 @@ main {
     cursor: pointer;
 }
 
+.pointer:hover {
+    cursor: pointer;
+}
+
 .card_description {
     overflow: hidden;
     display: -webkit-box;

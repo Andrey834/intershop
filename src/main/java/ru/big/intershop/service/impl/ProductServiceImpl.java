@@ -3,7 +3,6 @@ package ru.big.intershop.service.impl;
 import org.springframework.stereotype.Service;
 import ru.big.intershop.dto.product.ProductDto;
 import ru.big.intershop.dto.product.ProductRequest;
-import ru.big.intershop.dto.product.ProductUpdate;
 import ru.big.intershop.mapper.ProductMapper;
 import ru.big.intershop.model.Product;
 import ru.big.intershop.repository.ProductRepository;
@@ -57,6 +56,11 @@ public class ProductServiceImpl implements ProductService {
         Product product = getProduct(id);
         imageService.delete(product.getImage());
         productRepository.delete(product);
+    }
+
+    @Override
+    public boolean existById(Long id) {
+        return productRepository.existsById(id);
     }
 
     private Product getProduct(Long id) {

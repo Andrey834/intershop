@@ -13,4 +13,6 @@ public interface ProductService {
     ProductDto get(Long id);
 
     void delete(Long id);
+
+    boolean existById(Long id);
 }

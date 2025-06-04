@@ -1,7 +1,10 @@
 package ru.big.intershop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +37,11 @@ public class Payment {
     private Long id;
     @Column(nullable = false, updatable = false)
     private LocalDateTime created;
-    @OneToOne
+    @Column(nullable = false)
+    private boolean paid;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @JsonBackReference
+    @ToString.Exclude
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
 

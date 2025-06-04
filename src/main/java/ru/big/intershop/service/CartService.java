@@ -1,17 +1,23 @@
 package ru.big.intershop.service;
 
-import ru.big.intershop.dto.product.ProductShortDto;
-import ru.big.intershop.model.OrderPart;
+import ru.big.intershop.dto.ItemCart;
+import ru.big.intershop.dto.ItemCartRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface CartService {
 
-    void add(Long productId);
+    void update(ItemCartRequest itemCartRequest);
 
-    void remove(String sessionId, Long id);
+    void remove(Long productId);
 
-    void removeAll(String sessionId);
+    void removeAll();
 
-    List<ProductShortDto> getAll(String sessionId);
+    Map<Long, Integer> getAll();
+
+    List<ItemCart> getCart();
+
+    BigDecimal getTotal();
 }
