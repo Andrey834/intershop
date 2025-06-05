@@ -1,4 +1,4 @@
-package ru.big.intershop.controller;
+package ru.big.intershop.controller.consumer;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;

@@ -22,6 +22,6 @@ public class PaymentClientStubImpl implements PaymentClient {
             log.info("Fail pay amount {}", amount);
         }
 
-        return false;
+        return result;
     }
 }

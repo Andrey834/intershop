@@ -17,6 +17,8 @@ public interface CartService {
 
     Map<Long, Integer> getAll();
 
+    ItemCart get(Long productId);
+
     List<ItemCart> getCart();
 
     BigDecimal getTotal();

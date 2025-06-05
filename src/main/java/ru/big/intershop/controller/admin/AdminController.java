@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.big.intershop.dto.product.ProductRequest;
 import ru.big.intershop.dto.product.ProductShortDto;
-import ru.big.intershop.dto.product.ProductUpdate;
 import ru.big.intershop.service.ProductSearchService;
 import ru.big.intershop.service.ProductService;
 
@@ -37,18 +36,18 @@ public class AdminController {
     }
 
     @PostMapping("/product")
-    public String addProduct(@ModelAttribute ProductRequest product, Model model) {
+    public String addProduct(@ModelAttribute ProductRequest product) {
         productService.create(product);
         return REDIRECT_PATH;
     }
 
-    @GetMapping("/product/{id}/edit")
+    /*@GetMapping("/product/{id}/edit")
     public String viewEditProduct(@PathVariable(name = "id") Long postId, Model model) {
         List<ProductShortDto> products = productSearchService.getAll();
         model.addAttribute("products", products);
         model.addAttribute("productRequest", ProductRequest.builder().build());
         return "admin-panel";
-    }
+    }*/
 
     @PostMapping("/product/{id}/edit")
     public String processEditProduct(@PathVariable(name = "id") Long id,

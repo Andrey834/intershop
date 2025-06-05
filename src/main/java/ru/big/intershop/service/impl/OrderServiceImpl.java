@@ -16,6 +16,7 @@ import ru.big.intershop.service.OrderService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -44,28 +45,23 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .created(LocalDateTime.now())
                 .build();
-        final Order newOrder = orderRepository.save(order);
 
-        List<OrderPart> orderParts = new ArrayList<>();
-        cart.stream().map(item -> OrderPart.builder()
-                .order(newOrder)
-                .product(Product.builder().id(item.product().id()).build())
-                .quantity(item.quantity())
-                .price(item.product().price())
-                .build())
-        .forEach(orderParts::add);
-        orderPartRepository.saveAll(orderParts);
-
+        order = orderRepository.save(order);
+        saveParts(order, cart);
         cartService.removeAll();
 
-        return newOrder.getId();
+        return order.getId();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderDto> findAll() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(OrderMapper::toDto).toList();
+        return orders.stream()
+                .map(OrderMapper::toDto)
+                .sorted(Comparator.comparing(OrderDto::created))
+                .toList()
+                .reversed();
     }
 
     @Override
@@ -79,6 +75,19 @@ public class OrderServiceImpl implements OrderService {
         Order order = findById(payment.getOrder().getId());
         order.setPayment(payment);
         orderRepository.save(order);
+    }
+
+    private void saveParts(Order order, List<ItemCart> cart) {
+        List<OrderPart> orderParts = new ArrayList<>();
+        cart.stream().map(item -> OrderPart.builder()
+                        .order(order)
+                        .product(Product.builder().id(item.product().id()).build())
+                        .quantity(item.quantity())
+                        .price(item.product().price())
+                        .build())
+                .forEach(orderParts::add);
+
+        orderPartRepository.saveAll(orderParts);
     }
 
     private Order findById(Long id) {

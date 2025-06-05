@@ -73,7 +73,9 @@
     <section class="d-flex flex-wrap flex-row justify-content-center gap-3 mb-3">
         <h3 th:if="${products.size() == 0}">Ничего не найдено</h3>
         <div class="card card-focus" style="width: 18rem; height: 26rem" th:each="product : ${products}">
-            <img class="card-img-top h-50 pe-none" th:src="${'images/' + product.image()}" alt="...">
+            <a class="h-50" th:href="@{/product/{id}(id=${product.id()})}">
+                <img class="card-img-top h-100 pe-none" th:src="${'images/' + product.image()}" alt="...">
+            </a>
             <div class="card-body d-flex flex-column justify-content-between">
                 <h5 class="card-title" th:text="${product.title()}"></h5>
                 <p class="card-text card_description" th:text="${product.description()}"></p>
@@ -88,7 +90,7 @@
                                 th:value="1"
                                 type="submit">
                             <i class="bi bi-cart-plus">
-                        </i></button>
+                            </i></button>
                         <div th:if="${cart.get(product.id()) != null}" class="btn-group" role="group"
                              aria-label="Basic outlined example">
                             <button type="submit" class="btn btn-outline-primary" th:name="quantity"
@@ -177,7 +179,7 @@
         crossorigin="anonymous"></script>
 <script th:inline="javascript">
     function orderSort(value) {
-         document.getElementById('sortDirection').value = value;
+        document.getElementById('sortDirection').value = value;
     }
 </script>
 </body>

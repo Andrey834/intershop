@@ -1,10 +1,8 @@
-package ru.big.intershop.controller;
+package ru.big.intershop.controller.consumer;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,7 @@ public class OrderController {
     public String viewOrders(Model model) {
         List<OrderDto> orders = orderService.findAll();
         model.addAttribute("orders", orders);
-        return "orders";
+        return ViewName.ORDERS.getValue();
     }
 
     @PostMapping

@@ -14,5 +14,7 @@ public interface ProductSearchService {
 
     List<ProductShortDto> getAllByIds(List<Long> ids);
 
+    ProductShortDto getById(Long id);
+
     int countPages(PageParam pageParam);
 }

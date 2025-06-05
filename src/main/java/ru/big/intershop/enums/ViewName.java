@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ViewName {
     PRODUCTS("main"),
+    PRODUCT("product"),
     ORDER("order"),
+    ORDERS("orders"),
+    CART("cart"),
     PAYMENT("payment"),
     PAYMENT_RESULT("payment-result");
 

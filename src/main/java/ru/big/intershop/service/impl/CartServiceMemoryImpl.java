@@ -26,7 +26,6 @@ public class CartServiceMemoryImpl implements CartService {
         this.productSearchService = productSearchService;
     }
 
-
     @Override
     public void update(ItemCartRequest itemCartRequest) {
         if (productService.existById(itemCartRequest.productId())) {
@@ -54,6 +53,15 @@ public class CartServiceMemoryImpl implements CartService {
     }
 
     @Override
+    public ItemCart get(Long productId) {
+        ProductShortDto productShortDto = productSearchService.getById(productId);
+        return ItemCart.builder()
+                .product(productShortDto)
+                .quantity(cart.getOrDefault(productId, 0))
+                .build();
+    }
+
+    @Override
     public List<ItemCart> getCart() {
         List<Long> cartIds = new ArrayList<>(cart.keySet());
         List<ProductShortDto> products = productSearchService.getAllByIds(cartIds);
@@ -64,6 +72,8 @@ public class CartServiceMemoryImpl implements CartService {
 
         return itemCarts;
     }
+
+
 
     @Override
     public BigDecimal getTotal() {
