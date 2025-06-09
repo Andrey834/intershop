@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: intershop
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  datasource:
+    url: ${IS_DB_URL}
+    username: ${IS_DB_USERNAME}
+    password: ${IS_DB_PASDWORD}
+  liquibase:
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    enabled: false
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+server:
+  port: 8081
+  tomcat:
+    max-http-form-post-size: 10MB

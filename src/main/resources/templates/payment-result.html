@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказы</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="icon" href="/img/favicon.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+<header class="mb-3">
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid p-0 m-auto content-width">
+            <a class="navbar-brand">Market</a>
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                <a th:href="@{/product}" type="button" class="btn btn-outline-primary">Каталог</a>
+                <a th:href="@{/order}" type="button" class="btn btn-outline-primary">Заказы</a>
+                <a th:href="@{/cart}" type="button" class="btn btn-outline-primary">Корзина</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<main class="card m-auto w-25 bg-light bg-gradient" onload="redirect()">
+    <h2 class="text-center mb-3" th:if="${payment.isPaid()}">Заказ успешно оплачен</h2>
+    <h2 class="text-center mb-3" th:unless="${payment.isPaid()}">Ошибка оплаты заказа</h2>
+    <div class="card-body">
+        <p th:text="${'№ ' + payment.id()}"></p>
+        <p th:text="${'Дата: ' + payment.created()}"></p>
+        <p th:text="${'Статус: ' + (payment.isPaid() ? 'Успешно' : 'Ошибка')}"></p>
+    </div>
+</main>
+<script>
+    function redirect() {
+        setTimeout(() => window.location.href = "/order", 3000);
+    }
+
+    window.onload = redirect;
+</script>
+</body>
+</html>
