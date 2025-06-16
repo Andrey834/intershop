@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-product-table.yaml
+  - include:
+      file: db/changelog/changeset/create-order-table.yaml
+  - include:
+      file: db/changelog/changeset/create-order_part-table.yaml
+  - include:
+      file: db/changelog/changeset/create-payment-table.yaml
+  - include:
+      file: db/changelog/changeset/change-order-table.yaml
+
+
+

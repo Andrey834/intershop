@@ -1,9 +1,11 @@
 package ru.big.intershop.client;
 
-import ru.big.intershop.dto.order.OrderDto;
 
-import java.math.BigDecimal;
+import reactor.core.publisher.Mono;
+import ru.big.intershop.dto.order.OrderDto;
+import ru.big.intershop.dto.payment.PaymentResultDto;
 
 public interface PaymentClient {
-    boolean pay(OrderDto orderDto);
+
+    Mono<PaymentResultDto> pay(OrderDto order);
 }

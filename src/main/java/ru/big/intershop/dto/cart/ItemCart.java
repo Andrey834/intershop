@@ -1,4 +1,4 @@
-package ru.big.intershop.dto;
+package ru.big.intershop.dto.cart;
 
 import lombok.Builder;
 import ru.big.intershop.dto.product.ProductShortDto;

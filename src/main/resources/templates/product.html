@@ -44,13 +44,13 @@
                     <form class="float-end" action="/cart" method="post">
                         <input type="hidden" name="productId" th:value="${product.id()}">
                         <input type="hidden" name="from" th:value="'product/' + ${product.id()}">
-                        <button th:if="${itemCart.quantity() <= 0}" class="btn btn-outline-primary"
+                        <button th:if="${itemCart == null || itemCart.quantity() <= 0}" class="btn btn-outline-primary"
                                 th:name="quantity"
                                 th:value="1"
                                 type="submit">
                             <i class="bi bi-cart-plus">
                             </i></button>
-                        <div th:if="${itemCart.quantity() > 0}" class="btn-group" role="group"
+                        <div th:if="${itemCart != null && itemCart.quantity() > 0}" class="btn-group" role="group"
                              aria-label="Basic outlined example">
                             <button type="submit" class="btn btn-outline-primary" th:name="quantity"
                                     th:value="${itemCart.quantity() - 1}">

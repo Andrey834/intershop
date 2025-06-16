@@ -1,16 +1,11 @@
 package ru.big.intershop.service;
 
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.payment.PaymentDto;
-
-import java.util.List;
 
 public interface PaymentService {
 
-    Long payment(Long orderId);
+    Mono<Long> pay(Long orderId);
 
-    PaymentDto get(Long paymentId);
-
-    List<PaymentDto> getAllByOrderId(Long orderId);
-
-    void remove(Long paymentId);
+    Mono<PaymentDto> getById(Long id);
 }

@@ -9,7 +9,7 @@ public record ProductShortDto(
         Long id,
         String title,
         String description,
-        BigDecimal price,
-        String image
+        String image,
+        BigDecimal price
 ) {
 }

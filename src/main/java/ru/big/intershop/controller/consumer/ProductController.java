@@ -1,56 +1,58 @@
 package ru.big.intershop.controller.consumer;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.reactive.result.view.Rendering;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.PageParam;
-import ru.big.intershop.dto.product.ProductDto;
+import ru.big.intershop.dto.cart.CartShort;
+import ru.big.intershop.dto.cart.ItemCartShort;
 import ru.big.intershop.dto.product.ProductShortDto;
 import ru.big.intershop.enums.ViewName;
 import ru.big.intershop.service.CartService;
 import ru.big.intershop.service.ProductSearchService;
-import ru.big.intershop.service.ProductService;
-
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/product")
 public class ProductController {
     private final ProductSearchService productSearchService;
     private final CartService cartService;
-    private final ProductService productService;
 
-    public ProductController(ProductSearchService productSearchService,
-                             CartService cartService, ProductService productService) {
+    public ProductController(ProductSearchService productSearchService, CartService cartService) {
         this.productSearchService = productSearchService;
         this.cartService = cartService;
-        this.productService = productService;
     }
 
     @GetMapping
-    public String viewProducts(@ModelAttribute PageParam pageParam, Model model) {
-        int maxPages = productSearchService.countPages(pageParam);
-        pageParam.setMaxPages(maxPages);
+    public Mono<Rendering> viewProducts(@ModelAttribute PageParam pageParam) {
+        Flux<ProductShortDto> products = productSearchService.setMaxPage(pageParam)
+                .flatMapMany(productSearchService::getAll);
 
-        List<ProductShortDto> products = productSearchService.getAll(pageParam);
-        Map<Long, Integer> cart = cartService.getAll();
+        Mono<CartShort> cart = cartService.getCartShort();
 
-        model.addAttribute("products", products);
-        model.addAttribute("pageParam", pageParam);
-        model.addAttribute("cart", cart);
-        return ViewName.PRODUCTS.getValue();
+        Rendering rendering = Rendering.view(ViewName.PRODUCTS.getValue())
+                .modelAttribute("products", products)
+                .modelAttribute("pageParam", pageParam)
+                .modelAttribute("cart", cart)
+                .build();
+
+        return Mono.just(rendering);
     }
 
     @GetMapping("/{id}")
-    public String viewProduct(@PathVariable Long id, Model model) {
-        ProductDto productDto = productService.get(id);
-        model.addAttribute("product", productDto);
-        model.addAttribute("itemCart", cartService.get(id));
-        return ViewName.PRODUCT.getValue();
-    }
+    public Mono<Rendering> viewProduct(@PathVariable Long id) {
+        Mono<ProductShortDto> product = productSearchService.getById(id);
+        Mono<ItemCartShort> itemCart = cartService.getItemCart(id);
 
+        Rendering rendering = Rendering.view(ViewName.PRODUCT.getValue())
+                .modelAttribute("product", product)
+                .modelAttribute("itemCart", itemCart)
+                .build();
+
+        return Mono.just(rendering);
+    }
 }

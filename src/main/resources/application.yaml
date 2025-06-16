@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: intershop
+  threads:
+    virtual:
+      enabled: true
+  r2dbc:
+    url: r2dbc:postgresql://${IS_PG_URL}
+    username: ${IS_PG_USER}
+    password: ${IS_PG_PASSWORD}
+  data:
+    redis:
+      url: redis://${IS_REDIS_HOST}:${IS_REDIS_PORT}/0
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://${IS_PG_URL}
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+server:
+  port: ${IS_PORT}

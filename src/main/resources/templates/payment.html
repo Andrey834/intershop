@@ -58,10 +58,9 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="d-flex justify-content-between align-items-center pb-1">
                                 <a href="/order" class="text-muted">Отменить</a>
-                                <form action="/payment" method="POST">
+                                <form th:action="@{/payment/order/{orderId}(orderId=${order.id()})}" method="POST">
                                     <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                             th:name="orderId"
                                             th:value="${order.id()}"
@@ -78,3 +77,4 @@
 </main>
 </body>
 </html>
+

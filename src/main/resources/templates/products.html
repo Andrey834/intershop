@@ -27,7 +27,7 @@
 <main class="pb-5">
     <div class="mb-3">
         <form class="d-flex" id="search-form" method="GET">
-            <input type="hidden" id="sortDirection" th:name="sortDirection" value="DESC">
+            <input type="hidden" id="sortDirection" name="sortDirection" value="DESC">
             <input class="form-control me-2" name="search" th:value="${pageParam.getSearch()}" autofocus type="search"
                    placeholder="Search"
                    aria-label="Search">
@@ -72,7 +72,7 @@
     </div>
     <section class="d-flex flex-wrap flex-row justify-content-center gap-3 mb-3">
         <h3 th:if="${products.size() == 0}">Ничего не найдено</h3>
-        <div class="card card-focus" style="width: 18rem; height: 26rem" th:each="product : ${products}">
+        <div class="card focus" style="width: 18rem; height: 26rem" th:each="product : ${products}">
             <a class="h-50" th:href="@{/product/{id}(id=${product.id()})}">
                 <img class="card-img-top h-100 pe-none" th:src="${'images/' + product.image()}" alt="...">
             </a>
@@ -84,25 +84,24 @@
                     <form action="/cart" method="post">
                         <input type="hidden" name="productId" th:value="${product.id()}">
                         <input type="hidden" name="from" value="product">
-
-                        <button th:if="${cart.get(product.id()) == null}" class="btn btn-outline-primary"
+                        <button th:if="${cart.getQuantity(product.id()) <= 0}" class="btn btn-outline-primary"
                                 th:name="quantity"
                                 th:value="1"
                                 type="submit">
-                            <i class="bi bi-cart-plus">
-                            </i></button>
-                        <div th:if="${cart.get(product.id()) != null}" class="btn-group" role="group"
+                            <i class="bi bi-cart-plus"></i>
+                        </button>
+                        <div th:if="${cart.getQuantity(product.id()) > 0}" class="btn-group" role="group"
                              aria-label="Basic outlined example">
                             <button type="submit" class="btn btn-outline-primary" th:name="quantity"
-                                    th:value="${cart.get(product.id()) - 1}">
+                                    th:value="${cart.getQuantity(product.id()) - 1}">
                                 <i class="bi bi-dash"></i>
                             </button>
                             <button type="button" class="btn btn-outline-primary" disabled
-                                    th:text="${cart.get(product.id())}">
+                                    th:text="${cart.getQuantity(product.id())}">
 
                             </button>
                             <button type="submit" class="btn btn-outline-primary" th:name="quantity"
-                                    th:value="${cart.get(product.id()) + 1}">
+                                    th:value="${cart.getQuantity(product.id()) + 1}">
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>

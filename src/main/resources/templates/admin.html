@@ -176,5 +176,14 @@
         const button = document.getElementById(buttonId);
         button.innerText = text
     }
+
+    document.querySelector('input[id="imageInput"]').onchange = event => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const promoSelector = document.querySelector('img[id="promoImage"]');
+            promoSelector.src = e.target.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    };
 </script>
 </html>

@@ -23,7 +23,7 @@ main {
     width: var(--content-width);
 }
 
-.card-focus:hover {
+.focus:hover {
     scale: 1.007;
     cursor: pointer;
 }

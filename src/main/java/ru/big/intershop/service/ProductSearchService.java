@@ -1,6 +1,7 @@
 package ru.big.intershop.service;
 
-import org.springframework.data.domain.Pageable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.PageParam;
 import ru.big.intershop.dto.product.ProductShortDto;
 
@@ -8,13 +9,11 @@ import java.util.List;
 
 public interface ProductSearchService {
 
-    List<ProductShortDto> getAll();
+    Flux<ProductShortDto> getAll(PageParam pageParam);
 
-    List<ProductShortDto> getAll(PageParam pageParam);
+    Flux<ProductShortDto> getAllByIds(List<Long> ids);
 
-    List<ProductShortDto> getAllByIds(List<Long> ids);
+    Mono<ProductShortDto> getById(Long id);
 
-    ProductShortDto getById(Long id);
-
-    int countPages(PageParam pageParam);
+    Mono<PageParam> setMaxPage(PageParam pageParam);
 }

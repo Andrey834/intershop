@@ -1,17 +1,16 @@
 package ru.big.intershop.controller.consumer;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.reactive.result.view.Rendering;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.order.OrderDto;
 import ru.big.intershop.enums.ViewName;
 import ru.big.intershop.service.OrderService;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/order")
@@ -23,25 +22,34 @@ public class OrderController {
     }
 
     @GetMapping
-    public String viewOrders(Model model) {
-        List<OrderDto> orders = orderService.findAll();
-        model.addAttribute("orders", orders);
-        return ViewName.ORDERS.getValue();
-    }
+    public Mono<Rendering> viewOrders() {
+        Flux<OrderDto> orders = orderService.getAll();
 
-    @PostMapping
-    public ModelAndView processOrder() {
-        Long orderId = orderService.create();
-        ModelAndView paymentMav = new ModelAndView("redirect:/" + ViewName.PAYMENT.getValue());
-        paymentMav.addObject("orderId", orderId);
-        return paymentMav;
+        Rendering rendering = Rendering.view(ViewName.ORDERS.getValue())
+                .modelAttribute("orders", orders)
+                .build();
+
+        return Mono.just(rendering);
     }
 
     @GetMapping("/{id}")
-    public String viewOrder(@PathVariable(name = "id") Long id,
-                            Model model) {
-        OrderDto order = orderService.getById(id);
-        model.addAttribute("order", order);
-        return ViewName.ORDER.getValue();
+    public Mono<Rendering> viewOrder(@PathVariable(name = "id") Long id) {
+        Mono<OrderDto> order = orderService.get(id);
+
+        Rendering rendering = Rendering.view(ViewName.ORDER.getValue())
+                .modelAttribute("order", order)
+                .build();
+
+        return Mono.just(rendering);
+    }
+
+    @PostMapping
+    public Mono<Rendering> processOrder() {
+        return orderService.create().flatMap(id -> {
+            Rendering rendering = Rendering.redirectTo("/order/" + id)
+                    .build();
+
+            return Mono.just(rendering);
+        });
     }
 }
