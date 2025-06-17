@@ -1,0 +1,73 @@
+services:
+  pg-intershop:
+    image: postgres:17.5
+    container_name: intershop-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - network
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
+    environment:
+      - POSTGRES_DB=${IS_PG_DB}
+      - POSTGRES_PASSWORD=${IS_PG_PASSWORD}
+      - POSTGRES_USER=${IS_PG_USER}
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - ${IS_PG_PORT}:5432
+
+  redis:
+    image: redis:8.0.2
+    container_name: intershop-redis
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ${IS_REDIS_PORT}:6379
+    networks:
+      - network
+    command: redis-server
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    tty: true
+    stdin_open: true
+
+  intershop-service:
+    build: .
+    container_name: intershop
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:${IS_PORT}/actuator/health || exit 1
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 6
+    networks:
+      - network
+    depends_on:
+      pg-intershop:
+        condition: service_started
+    ports:
+      - ${IS_PORT}:${IS_PORT}
+    env_file:
+      - .env
+    environment:
+      - IS_PG_URL=intershop-db:5432/${IS_PG_DB}
+      - IS_PG_USER=${IS_PG_USER}
+      - IS_PG_PASSWORD=${IS_PG_PASSWORD}
+      - IS_PORT=${IS_PORT}
+      - IS_REDIS_HOST=intershop-redis
+      - IS_REDIS_PORT=6379
+      - IS_REDIS_PASSWORD=${IS_REDIS_PASSWORD}
+
+networks:
+  network:
+    name: intershop
