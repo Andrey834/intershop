@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 public record OrderPartDto(
         Long id,
         ProductShortDto product,
-        int quantity,
-        BigDecimal price
+        BigDecimal price,
+        int quantity
 ) {
-
 }

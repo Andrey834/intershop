@@ -6,13 +6,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ViewName {
-    PRODUCTS("main"),
+    PRODUCTS("products"),
     PRODUCT("product"),
+    CART("cart"),
+    ADMIN("admin"),
     ORDER("order"),
     ORDERS("orders"),
-    CART("cart"),
     PAYMENT("payment"),
-    PAYMENT_RESULT("payment-result");
+    PAYMENT_RESULT("payment-result"),
+    ERROR("error");
 
     private final String value;
 }

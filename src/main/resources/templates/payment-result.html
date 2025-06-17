@@ -25,17 +25,18 @@
     </nav>
 </header>
 <main class="card m-auto w-25 bg-light bg-gradient" onload="redirect()">
-    <h2 class="text-center mb-3" th:if="${payment.isPaid()}">Заказ успешно оплачен</h2>
-    <h2 class="text-center mb-3" th:unless="${payment.isPaid()}">Ошибка оплаты заказа</h2>
+    <h2 class="text-center m-2">Оплата заказа</h2>
     <div class="card-body">
-        <p th:text="${'№ ' + payment.id()}"></p>
-        <p th:text="${'Дата: ' + payment.created()}"></p>
-        <p th:text="${'Статус: ' + (payment.isPaid() ? 'Успешно' : 'Ошибка')}"></p>
+        <p th:text="${'Пллатеж: ' + payment.id()}"></p>
+        <p th:text="${'Оплата заказа: ' + payment.orderId()}"></p>
+        <p th:text="${'Дата: ' + payment.paymentDate()}"></p>
+        <p th:text="${'Сумма: ' + payment.sum()} + '&#8381'"></p>
+        <p>Статус: Успешно</p>
     </div>
 </main>
 <script>
     function redirect() {
-        setTimeout(() => window.location.href = "/order", 3000);
+        setTimeout(() => window.location.href = "/order", 10000);
     }
 
     window.onload = redirect;

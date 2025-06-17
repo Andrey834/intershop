@@ -1,13 +1,19 @@
 package ru.big.intershop.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.product.ProductDto;
 import ru.big.intershop.dto.product.ProductRequest;
 import ru.big.intershop.mapper.ProductMapper;
 import ru.big.intershop.model.Product;
-import ru.big.intershop.repository.ProductRepository;
+import ru.big.intershop.reposioty.ProductRepository;
 import ru.big.intershop.service.ImageService;
 import ru.big.intershop.service.ProductService;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -20,51 +26,57 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto create(ProductRequest productRequest) {
-        String imageName = imageService.save(productRequest.image());
-        Product product = ProductMapper.toProduct(productRequest);
-        product.setImage(imageName);
-        Product newProduct = productRepository.save(product);
-
-        return ProductMapper.toDto(newProduct);
+    @Transactional
+    public Mono<Long> save(ProductRequest request) {
+        return imageService.save(request.image())
+                .flatMap(imageName -> {
+                            Product product = ProductMapper.toModel(request);
+                            product.setImage(imageName);
+                            product.setCreated(LocalDateTime.now());
+                            return Mono.just(product);
+                        }
+                )
+                .flatMap(productRepository::save)
+                .map(Product::getId);
     }
 
     @Override
-    public void update(Long id, ProductRequest productRequest) {
-        Product product = getProduct(id);
+    public Mono<Long> update(Long id, ProductRequest request) {
+        Mono<Product> product = getById(id);
+        Mono<String> imageName = request.image() != null
+                ? imageService.save(request.image())
+                : Mono.just("empty");
 
-        if (!productRequest.image().isEmpty()) {
-            imageService.delete(product.getImage());
-            String imageName = imageService.save(productRequest.image());
-            product.setImage(imageName);
-        }
+        return imageName
+                .zipWith(product, (fileName, prod) -> {
+                    if (!fileName.equals("empty")) {
+                        imageService.delete(prod.getImage());
+                        prod.setImage(fileName);
+                    }
+                    prod.setTitle(request.title());
+                    prod.setDescription(request.description());
+                    prod.setPrice(request.price());
 
-        product.setTitle(productRequest.title());
-        product.setDescription(productRequest.description());
-        product.setPrice(productRequest.price());
-
-        productRepository.save(product);
+                    return prod;
+                })
+                .flatMap(productRepository::save)
+                .map(Product::getId);
     }
 
     @Override
-    public ProductDto get(Long id) {
-        return ProductMapper.toDto(getProduct(id));
+    public Mono<Void> delete(Long id) {
+        return getById(id).flatMap(productRepository::delete);
     }
 
     @Override
-    public void delete(Long id) {
-        Product product = getProduct(id);
-        imageService.delete(product.getImage());
-        productRepository.delete(product);
+    public Flux<ProductDto> getAll() {
+        return productRepository.findAll()
+                .map(ProductMapper::toDto)
+                .sort(Comparator.comparing(ProductDto::id));
     }
 
-    @Override
-    public boolean existById(Long id) {
-        return productRepository.existsById(id);
-    }
-
-    private Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("Product not found - " + id));
+    private Mono<Product> getById(Long id) {
+        return productRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Product not found with id: " + id)));
     }
 }

@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add_fk_payment_id_column
+      author: Andrey M
+      context: develop
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: order
+            baseColumnNames: payment_id
+            referencedTableName: payment
+            referencedColumnNames: id
+            constraintName: fk_order_payment_id

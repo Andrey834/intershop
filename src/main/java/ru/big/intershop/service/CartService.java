@@ -1,25 +1,21 @@
 package ru.big.intershop.service;
 
-import ru.big.intershop.dto.ItemCart;
-import ru.big.intershop.dto.ItemCartRequest;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import reactor.core.publisher.Mono;
+import ru.big.intershop.dto.cart.Cart;
+import ru.big.intershop.dto.cart.CartShort;
+import ru.big.intershop.dto.cart.ItemCartShort;
 
 public interface CartService {
 
-    void update(ItemCartRequest itemCartRequest);
+    Mono<Void> update(ItemCartShort itemCart);
 
-    void remove(Long productId);
+    Mono<CartShort> getCartShort();
 
-    void removeAll();
+    Mono<Void> delete(Long productId);
 
-    Map<Long, Integer> getAll();
+    Mono<Cart> getCart();
 
-    ItemCart get(Long productId);
+    Mono<ItemCartShort> getItemCart(Long productId);
 
-    List<ItemCart> getCart();
-
-    BigDecimal getTotal();
+    Mono<Long> clearCart(Long orderId);
 }

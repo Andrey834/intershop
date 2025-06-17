@@ -1,17 +1,17 @@
 package ru.big.intershop.service;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.order.OrderDto;
 import ru.big.intershop.model.Payment;
 
-import java.util.List;
-
 public interface OrderService {
 
-    Long create();
+    Mono<Long> create();
 
-    List<OrderDto> findAll();
+    Flux<OrderDto> getAll();
 
-    OrderDto getById(Long id);
+    Mono<OrderDto> get(Long orderId);
 
-    void setPayment(Payment payment);
+    Mono<Payment> setPayment(Payment payment);
 }

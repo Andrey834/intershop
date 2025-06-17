@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-order_part-table
+      author: Andrey M
+      context: develop
+      changes:
+        - createTable:
+            tableName: order_part
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: price
+                  type: numeric(38,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: int4
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_part_order_id
+                    referencedTableName: order
+                    referencedColumnNames: id
+                    deleteCascade: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_part_product_id
+                    referencedTableName: product
+                    referencedColumnNames: id
+                    deleteCascade: true
+                    nullable: false

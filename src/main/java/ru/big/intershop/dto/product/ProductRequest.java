@@ -1,7 +1,7 @@
 package ru.big.intershop.dto.product;
 
 import lombok.Builder;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
 
 import java.math.BigDecimal;
 
@@ -10,6 +10,5 @@ public record ProductRequest(
         String title,
         String description,
         BigDecimal price,
-        MultipartFile image
-) {
+        FilePart image) {
 }

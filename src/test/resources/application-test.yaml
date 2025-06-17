@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: inatershop2
+  threads:
+    virtual:
+      enabled: true
+  sql:
+    init:
+      mode: always
+  liquibase:
+    enabled: false
+  data:
+    redis:
+      url: redis://localhost
+

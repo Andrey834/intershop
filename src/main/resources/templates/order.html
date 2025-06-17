@@ -27,38 +27,34 @@
 <main>
     <div class="card mb-3">
         <div class="card-body bg-light bg-gradient">
-            <p>Заказ:
-                <a class="card-title pointer link-primary m-0"
-                   th:href="@{/order/{id}(id=${order.id()})}"
-                   th:text="${order.id()} + ' от ' + ${order.getShortDate()}">
-                </a>
+            <p class="card-title link-primary m-3"
+               th:text="${'Заказ: ' + order.id()} + ' от ' + ${order.getDateTime()}">
             </p>
             <ol class="list-group list-group-numbered mb-3">
                 <li class="list-group-item d-flex justify-content-between align-items-start"
                     th:each="part : ${order.parts()}">
                     <div class="ms-2 me-auto w-100">
                         <div class="d-flex justify-content-between">
-                            <p class="link-info fw-bold m-0" th:text="${part.product().title()}"></p>
-                            <a class="pointer link-primary m-0" th:text="'ID: ' + ${part.product().id()}"></a>
-                        </div>
-                        <div class="d-flex justify-content-between">
+                            <a class="link-info fw-bold m-0 focus" th:text="${part.product().title()}"
+                               th:href="@{/product/{id}(id=${part.product().id()})}"></a>
                             <p class="m-0" th:text="${part.quantity()} + ' шт. x ' + ${part.price()} + '&#8381'"></p>
+                        </div>
+                        <div class="d-flex justify-content-end">
                             <p class="m-0" th:text="'Итого: ' + ${part.quantity() * part.price()} + '&#8381'"></p>
                         </div>
                     </div>
                 </li>
             </ol>
             <div class="d-flex justify-content-between align-items-center">
-                <form th:action="@{/payment/{id}(id=${order.payment().id()})}"
+                <form th:action="@{/payment/{id}(id=${order.paymentId()})}"
                       method="GET"
-                      th:if="${order.payment() != null && order.payment().isPaid()}">
+                      th:if="${order.paymentId() != null && order.paymentId() != 0}">
                     <button type="submit" class="btn btn-link text-success">Оплачено</button>
                 </form>
-                <form action="/payment" method="GET" th:if="${order.payment() == null || !order.payment().isPaid()}">
-                    <button type="submit" class="btn btn-link text-danger" th:name="orderId"
-                            th:value="${order.id()}">Не оплачено
-                    </button>
-                </form>
+                <a th:if="${order.paymentId() == null || order.paymentId() == 0}"
+                   th:href="@{/payment/order/{orderId}(orderId=${order.id()})}"
+                   type="submit" class="btn btn-link text-danger"
+                >Оплатить</a>
                 <p class="fw-bold m-0" th:text="'Сумма: ' + ${order.getTotal()} + '&#8381'"></p>
             </div>
         </div>

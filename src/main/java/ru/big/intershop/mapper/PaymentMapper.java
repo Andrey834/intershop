@@ -1,6 +1,7 @@
 package ru.big.intershop.mapper;
 
 import ru.big.intershop.dto.payment.PaymentDto;
+import ru.big.intershop.dto.payment.PaymentResultDto;
 import ru.big.intershop.model.Payment;
 
 public class PaymentMapper {
@@ -8,22 +9,19 @@ public class PaymentMapper {
     }
 
     public static PaymentDto toDto(Payment payment) {
-        if (payment != null) {
-            return PaymentDto.builder()
-                    .id(payment.getId())
-                    .created(payment.getCreated())
-                    .isPaid(payment.isPaid())
-                    .build();
-        } else {
-            return null;
-        }
+        return PaymentDto.builder()
+                .id(payment.getId())
+                .paymentDate(payment.getPaymentDate())
+                .sum(payment.getSum())
+                .orderId(payment.getOrderId())
+                .build();
     }
 
-    public static Payment toEntity(PaymentDto paymentDto) {
+    public static Payment toModel(PaymentResultDto paymentResultDto) {
         return Payment.builder()
-                .id(paymentDto.id())
-                .created(paymentDto.created())
-                .paid(paymentDto.isPaid())
+                .sum(paymentResultDto.sum())
+                .orderId(paymentResultDto.orderId())
+                .paymentDate(paymentResultDto.paidDate())
                 .build();
     }
 }

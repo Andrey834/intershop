@@ -1,18 +1,17 @@
 package ru.big.intershop.service;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.dto.product.ProductDto;
 import ru.big.intershop.dto.product.ProductRequest;
-import ru.big.intershop.dto.product.ProductUpdate;
 
 public interface ProductService {
 
-    ProductDto create(ProductRequest productRequest);
+    Mono<Long> save(ProductRequest request);
 
-    void update(Long id, ProductRequest productRequest);
+    Mono<Long> update(Long id, ProductRequest request);
 
-    ProductDto get(Long id);
+    Mono<Void> delete(Long id);
 
-    void delete(Long id);
-
-    boolean existById(Long id);
+    Flux<ProductDto> getAll();
 }

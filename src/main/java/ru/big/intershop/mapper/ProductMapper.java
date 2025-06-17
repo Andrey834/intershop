@@ -1,21 +1,13 @@
 package ru.big.intershop.mapper;
 
+
 import ru.big.intershop.dto.product.ProductDto;
 import ru.big.intershop.dto.product.ProductRequest;
 import ru.big.intershop.dto.product.ProductShortDto;
 import ru.big.intershop.model.Product;
 
 public class ProductMapper {
-
     private ProductMapper() {
-    }
-
-    public static Product toProduct(ProductRequest productRequest) {
-        return Product.builder()
-                .title(productRequest.title())
-                .description(productRequest.description())
-                .price(productRequest.price())
-                .build();
     }
 
     public static ProductDto toDto(Product product) {
@@ -36,6 +28,14 @@ public class ProductMapper {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .image(product.getImage())
+                .build();
+    }
+
+    public static Product toModel(ProductRequest productRequest) {
+        return Product.builder()
+                .title(productRequest.title())
+                .description(productRequest.description())
+                .price(productRequest.price())
                 .build();
     }
 }

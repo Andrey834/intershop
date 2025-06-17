@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payment-table
+      author: Andrey M
+      context: develop
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: payment_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueDate: current_timestamp()
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_part_order_id
+                    referencedTableName: order
+                    referencedColumnNames: id
+                    deleteCascade: true
+                    nullable: false
+              - column:
+                  name: sum
+                  type: numeric(38,2)
+                  constraints:
+                    nullable: false

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.service.ImageService;
 
 @RestController
@@ -18,7 +19,7 @@ public class ImageController {
     }
 
     @GetMapping(value = "/{imageName}", produces = MediaType.IMAGE_PNG_VALUE)
-    public Resource loadImage(@PathVariable(name = "imageName") String imageName) {
+    public Mono<Resource> loadImage(@PathVariable(name = "imageName") String imageName) {
         return imageService.get(imageName);
     }
 }

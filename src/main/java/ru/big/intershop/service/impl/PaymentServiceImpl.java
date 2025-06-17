@@ -1,79 +1,50 @@
 package ru.big.intershop.service.impl;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.client.PaymentClient;
-import ru.big.intershop.dto.order.OrderDto;
 import ru.big.intershop.dto.payment.PaymentDto;
-import ru.big.intershop.exception.PaymentException;
+import ru.big.intershop.dto.payment.PaymentResultDto;
 import ru.big.intershop.mapper.PaymentMapper;
-import ru.big.intershop.model.Order;
 import ru.big.intershop.model.Payment;
-import ru.big.intershop.repository.PaymentRepository;
+import ru.big.intershop.reposioty.PaymentRepository;
 import ru.big.intershop.service.OrderService;
 import ru.big.intershop.service.PaymentService;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
-    private final PaymentClient paymentClient;
     private final OrderService orderService;
+    private final PaymentClient paymentClient;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentClient paymentClient, OrderService orderService) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository,
+                              OrderService orderService,
+                              PaymentClient paymentClient) {
         this.paymentRepository = paymentRepository;
-        this.paymentClient = paymentClient;
         this.orderService = orderService;
+        this.paymentClient = paymentClient;
     }
 
     @Override
-    @Transactional
-    public Long payment(Long orderId) {
-        OrderDto orderDto = orderService.getById(orderId);
-        Payment payment = Payment.builder()
-                .order(Order.builder().id(orderDto.id()).build())
-                .created(LocalDateTime.now())
-                .paid(false)
-                .build();
-
-        Payment newPayment = paymentRepository.save(payment);
-
-        boolean isSuccessPayment = paymentClient.pay(orderDto);
-        if (isSuccessPayment) {
-            newPayment.setPaid(true);
-            newPayment = paymentRepository.save(newPayment);
-            orderService.setPayment(newPayment);
-            return newPayment.getId();
-        } else {
-            paymentRepository.delete(newPayment);
-            throw new PaymentException("Order is not paid");
-        }
+    public Mono<Long> pay(Long orderId) {
+        return orderService.get(orderId)
+                .flatMap(paymentClient::pay)
+                .filter(PaymentResultDto::isPaid)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Payment is not performed")))
+                .map(PaymentMapper::toModel)
+                .flatMap(paymentRepository::save)
+                .flatMap(orderService::setPayment)
+                .map(Payment::getId);
     }
 
     @Override
-    public PaymentDto get(Long paymentId) {
-        return PaymentMapper.toDto(getPayment(paymentId));
+    public Mono<PaymentDto> getById(Long id) {
+        return findById(id)
+                .map(PaymentMapper::toDto);
     }
 
-    @Override
-    public List<PaymentDto> getAllByOrderId(Long orderId) {
-        return paymentRepository.findAllByOrderId(orderId).stream()
-                .map(PaymentMapper::toDto)
-                .toList();
+    private Mono<Payment> findById(Long id) {
+        return paymentRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Payment not found with id: " + id)));
     }
-
-    @Override
-    public void remove(Long paymentId) {
-        paymentRepository.deleteById(paymentId);
-    }
-
-    private Payment getPayment(Long paymentId) {
-        return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-    }
-
-
 }

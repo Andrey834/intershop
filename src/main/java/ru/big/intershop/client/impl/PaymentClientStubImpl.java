@@ -1,27 +1,28 @@
 package ru.big.intershop.client.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import ru.big.intershop.client.PaymentClient;
 import ru.big.intershop.dto.order.OrderDto;
+import ru.big.intershop.dto.payment.PaymentResultDto;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-@Component
-@Slf4j
+@Service
 public class PaymentClientStubImpl implements PaymentClient {
+
     @Override
-    public boolean pay(OrderDto orderDto) {
-        boolean result = false;
-        BigDecimal amount = orderDto.getTotal();
+    public Mono<PaymentResultDto> pay(OrderDto order) {
+        PaymentResultDto payment = PaymentResultDto.builder()
+                .orderId(order.id())
+                .sum(order.getTotal())
+                .isPaid(true)
+                .paidDate(LocalDateTime.now())
+                .build();
 
-        if (amount.doubleValue() > 0) {
-            result = true;
-            log.info("Pay amount {}", amount);
-        } else {
-            log.info("Fail pay amount {}", amount);
+        if (order.paymentId() == null) {
+            return Mono.just(payment);
         }
-
-        return result;
+        return Mono.empty();
     }
 }
