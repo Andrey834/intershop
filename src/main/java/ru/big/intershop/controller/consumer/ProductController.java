@@ -1,5 +1,8 @@
 package ru.big.intershop.controller.consumer;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,7 +46,7 @@ public class ProductController {
         return Mono.just(rendering);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public Mono<Rendering> viewProduct(@PathVariable Long id) {
         Mono<ProductShortDto> product = productSearchService.getById(id);
         Mono<ItemCartShort> itemCart = cartService.getItemCart(id);
@@ -52,7 +55,7 @@ public class ProductController {
                 .modelAttribute("product", product)
                 .modelAttribute("itemCart", itemCart)
                 .build();
-
+        ResponseEntity.status(302).build();
         return Mono.just(rendering);
     }
 }
